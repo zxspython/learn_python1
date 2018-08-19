@@ -1,8 +1,12 @@
 #! /usr/bin/env python3
-
+import queue   #于后面 queue.Empty 有关
 import sys
 import os
 import csv
+from multiprocessing import Process,Queue
+
+q_user = Queue()
+q_result = Queue()
 
 #获得各文件的地址 Args.get_c .get_d .get_o
 class Args(object):
@@ -114,7 +118,7 @@ config = Config()
 print('{}'.format(config.JiShuL))
  
 
-class UserData(object):
+class UserData(Process):
     
     #初始化对象时使用._read_users_data()方法 
     #.userdata属性获取员工的数据，数据类型为 列表
@@ -123,12 +127,10 @@ class UserData(object):
     
     #获得员工信息列表
     def _read_users_data(self):
-        #创建空列表
-        userdata = []
         #每一行字符串,转化成列表
         #读取每一行
         with open(args.get_d) as f:
-            for line in f:
+            for line in f.readlines():
                 #字符串去䒈我去空格，以 ‘，’号分开成，列表
                 employee_id,income_string = line.strip().split(',')
                 #列表的前两个值转为int类型，作为userdata列表的一个元素
@@ -140,39 +142,34 @@ class UserData(object):
                     print('Parameter Error')
                     exit()
                 ###
-                userdata.append((employee_id,income))
-        #返回一个userdata列表
-        return userdata
+                yield (employee_id,income) 
 
-    ### 将Userdata 变为可迭代对象
-    ### for 循环可获得 userdata 的数据
-    def __iter__(self):
-        return iter(self.userdata)
-    ###
-#使用Args()文件地址，创建UserData(),处理文件，获得员工参数
-userdata = UserData()
-
+    def run(self):
+        for data in self._read_users_data():
+            q_user.put(data)
+        
 
 #工资单数据
-class Calculator(object):
+class Calculator(Process):
  
     #计算 员工工资单数据
     def calc_for_all_userdata(self):
-        line = []
-        JiShuL = config.JiShuL
-        JiShuH = config.JiShuH
-        s = config.s         
-        for i in userdata:
-            number = i[0]
-            salary = i[1]
+        while True:   # 注意，要一直循环，直到 queue.Empty,无法获取 
+            data = []
+            JiShuL = config.JiShuL
+            JiShuH = config.JiShuH
+            s = config.s         
+            try :
+                number,salary = q_user.get(timeout=1)
+            except queue.Empty:
+                return
             #计算社保金 salary_security
             if salary < JiShuL:
                 social_security = JiShuL * s
             elif salary >JiShuH:
                 social_security = JiShuH * s
             else :
-       
-         social_security = salary * s
+                social_security = salary * s
             #计算要交的税 tax
             #需要交税的钱 money_tex
             money_tax = salary - social_security - 3500
@@ -198,25 +195,37 @@ class Calculator(object):
             end_money =  salary - social_security - tax
 
             #将数据写入列表
-            line.append((number,'{:.2f}'.format(salary),'{:.2f}'.format(social_security),'{:.2f}'.format(tax),'{:.2f}'.format(end_money)))
-        return line
+            data += [number,'{:.2f}'.format(salary),'{:.2f}'.format(social_security),'{:.2f}'.format(tax),'{:.2f}'.format(end_money)]
+            yield data
+
+    def run(self):
+        for data in self.calc_for_all_userdata():
+            q_result.put(data) 
 
     #输出为 CSV 文件
-    def export(self,default='csv'):
-        #获得工资表
-        result = self.calc_for_all_userdata()
+class Exporter(Process):
+    def run(self): 
         #写模式打开 文件
         with open(args.get_o,'w',newline='') as f:
-            # csv 写文件
-            writer = csv.writer(f)
-            writer.writerows(result)
+            while True: #一直循环 ，直到无法获取 
+                # csv 写文件
+                writer = csv.writer(f)
+
+                #获得工资表
+                try:
+                    result = q_result.get(timeout=1)
+                except queue.Empty:
+                    return
+                writer.writerow(result)
 
 def main():    
-
-    #使用Config(),UserData(),创建Calculator(),计算员工工资表，输出文件
-    a = Calculator()
-    a.export()
-    print(a.calc_for_all_userdata())
-    print(args.get_o)
+    workers =[
+        UserData(),
+        Calculator(),
+        Exporter()
+    ]
+    for worker in workers:
+        worker.run()
+    
 if __name__ == '__main__':
     main()
