@@ -1,5 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+index
+{% endblock %}
+
+{% block body%}
+
 <ol>
+
     {% for i in File_All %}
-    <li><a href="{{ url_for('file', file_id=i.id) }}">{{ i }}</a>{{i.tags}}</li>
+    <li><a href="{{ url_for('file', file_id=i.id) }}"><span class='label label-default'>{{ i }}</span></a>{{i.tags}}</li>
     {% endfor %}
-</ol>
+<ol>
+{% endblock %}
+
+

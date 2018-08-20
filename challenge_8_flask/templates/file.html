@@ -1,7 +1,15 @@
-<div>
+{% extends 'base.html' %}
+
+{% block title %}
+file
+{% endblock%}
+
+{% block body %}
+<div class='container'>
     <p>id: {{file_content.id}}</p>
     <p>title:{{file_content.title}}</p>
     <p>created_time:{{file_content.created_time}}</p>
     <p>content:{{file_content.content}}</p>
     <p>category:{{file_content.category.name}}</p>
 </div>
+{% endblock %}
