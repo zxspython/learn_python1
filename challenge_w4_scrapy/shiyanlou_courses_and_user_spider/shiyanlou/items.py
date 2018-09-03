@@ -8,11 +8,19 @@
 import scrapy
 
 
-class CoursesItem(scrapy.Item):
+class UserItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    #爬虫scrapy 爬取的数据为一个字典，字典是无序的
-    #scrapy 推荐使用Item容器来存放数据
+    name = scrapy.Field()
+    type = scrapy.Field()
+    status = scrapy.Field()
+    job = scrapy.Field()
+    school = scrapy.Field()
+    join_date = scrapy.Field()
+    level = scrapy.Field()
+    learn_courses_num = scrapy.Field()
+
+class CoursesItem(scrapy.Item):
     name = scrapy.Field()
     description = scrapy.Field()
     type = scrapy.Field()
