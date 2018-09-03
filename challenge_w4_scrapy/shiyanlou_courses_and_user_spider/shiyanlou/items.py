@@ -5,12 +5,12 @@
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/items.html
 
+#使得 爬取的 字典类型数据（无序）,改变成结构型数据item
+
 import scrapy
 
 
 class UserItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
     name = scrapy.Field()
     type = scrapy.Field()
     status = scrapy.Field()

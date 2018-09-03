@@ -1,3 +1,5 @@
+#这个文件创建 ,关联 数据库 shiyanlou
+
 from sqlalchemy import Date
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
