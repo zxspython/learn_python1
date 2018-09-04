@@ -25,3 +25,7 @@ class CoursesItem(scrapy.Item):
     description = scrapy.Field()
     type = scrapy.Field()
     students = scrapy.Field()
+
+class CourseImageItem(scrapy.Item):
+    image_urls =scrapy.Field()
+    images = scrapy.Field()
