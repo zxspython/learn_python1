@@ -1,0 +1,44 @@
+<html>
+<head>
+    <meta charset='utf-8'/>
+    <title>Javascrip 控制语句 和 函数</title>
+</head>
+<body>
+<script>
+//定义相同名字的函数，后者会代替前者
+function my_func(){
+document.write(1)
+}
+my_func()
+document.write('<br>')
+function my_func(){
+document.write(2);
+}
+my_func();
+
+//条件语句练习
+function text_if(i){
+  if(i==1){
+      document.write('a')
+  }
+  else if(i==2){
+      document.write('b')
+  }
+  else{
+      document.write('xxxx.')
+  }
+}
+document.write('<br>')
+document.write('条件语句（if)测试')
+text_if(4)
+//条件语句练习
+function text_for(){
+ for (var i=0;i<5;i++){
+     document.write('number is ' + i +'<br/>');
+ }
+}
+document.write('循环语句测试<br>')
+text_for();
+</script>
+<body>
+</html>
