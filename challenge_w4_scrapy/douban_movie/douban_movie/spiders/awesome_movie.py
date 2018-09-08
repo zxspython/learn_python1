@@ -22,12 +22,12 @@ class AwesomeMovieSpider(scrapy.spider.CrawlSpider):
         item = MovieItem()
         item['url'] = response.url
         item['name'] = response.xpath('//span[@property="v:itemreviewed"]/text()').extract_first()
-        item['summary'] = response.xpaht('//span[@property="v:summary"]/text()').extract_first()
+        item['summary'] = response.xpath('//span[@property="v:summary"]/text()').extract_first()
         item['score'] =  response.xpath('//strong[@property="v:average"]/text()').extract_first()
-        retrun item
+        return item
 
     def parse_start_url(self,response):
         yield self.parse_movie_item(response)
 
     def parse_pate(self, response):
-        yield self.parse_movice_item(response)
+        yield self.parse_movie_item(response)

@@ -8,10 +8,10 @@
 import scrapy
 
 
-class DoubanMovieItem(scrapy.Item):
+class MovieItem(scrapy.Item):
     # name = scrapy.Field()
     url = scrapy.Field()
     name = scrapy.Field()
     summary = scrapy.Field()
     score = scrapy.Field()
-    pass
+
