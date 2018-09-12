@@ -1,3 +1,5 @@
+#!usr/bin/env python3
+#-*- conding:utf-8 -*-
 # rmon.model
 # 所有的 model类 以及相应的 序列化类
 
@@ -33,3 +35,6 @@ class Server(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+if __name__ == '__main__':
+    Server()
