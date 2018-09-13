@@ -6,8 +6,8 @@ rmon.common.rest
 '''
 
 class RestException(Exception):
-    #??????????
-
+    # 作为 访问redis 时出错时返回的异常
+    #创建方法 继承Exception 增加code message 属性
     def __init__(self,code,message):
         '''
         初始化异常
