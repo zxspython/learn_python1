@@ -5,6 +5,10 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+# Redis 服务器客户点连接Redis服务器，python 访问Redis客户端　redis-py
+# 目标在　server　中实现一个　redis 属性，对应redis 客户端
+from redis import StrictRedis,RedisError
+from rmon.common.rest import RestException
 
 #创建一个映射类
 #使用 db.session.add().delete().commit()
@@ -28,6 +32,15 @@ class Server(db.Model):
     def __repr__(self):
         return '<Server(name=%s)>'%self.name
 
+    @property
+    def redis(self):
+        # 基于redis.StrictRedis　实现访问Redis
+        # 客户端访问　Redis　可能会遇到一系列问题，这时候会抛出rediserror，我们要捕获异常，并成为我们自定义的异常。common
+        return StrictRedis(host=self.host,
+                           port=self.port,
+                           password=self.password)
+
+
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -36,5 +49,20 @@ class Server(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def ping(self):
+        # 检查Redis 服务器是否可访问
+        try:
+            return self.redis.ping()
+        except RedisError:
+            raise RestException(400,'redis server %s can not connected'% self.host)
+
+
+    def get_metrics(self):
+        # 获得　Redis 服务器监控信息
+        #　通过　Redis　服务器指令info 返回监控信息，参考　
+        try:
+            return self.redis.info()
+        except RedisError:
+            raise RestException(400,'redis server %s can not connected'% self.host)
 if __name__ == '__main__':
     Server()
